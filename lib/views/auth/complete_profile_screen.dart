@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../home/home_screen.dart';
+import '../../main_navigation.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
   final String uid;
@@ -88,9 +88,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         'email': email,
       });
 
-      Navigator.pushReplacement(
+      // ✅ Correct navigation to MainScreen (with bottom nav)
+      Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) =>  HomeScreen()),
+        MaterialPageRoute(builder: (_) => const MainScreen()),
+            (route) => false,
       );
     } catch (e) {
       _showError('Failed to save profile: $e');
@@ -98,6 +100,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       setState(() => _loading = false);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

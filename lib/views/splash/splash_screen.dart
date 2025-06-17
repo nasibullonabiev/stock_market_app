@@ -33,8 +33,8 @@ class _SplashScreenState extends State<SplashScreen> {
               decoration: BoxDecoration(
                 color: Colors.pink.shade100,
                 borderRadius: BorderRadius.circular(20),
+                image: const DecorationImage(image: AssetImage('assets/images/img_1.png'))
               ),
-              child: const Center(child: Text("Logo")),
             ),
             const SizedBox(height: 24),
             const Text('GAINORA', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),

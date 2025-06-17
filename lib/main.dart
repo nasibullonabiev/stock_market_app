@@ -14,6 +14,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Hive.initFlutter();
   await Hive.openBox('themeBox');
+  await Hive.openBox('stockBox');
 
   runApp(const MyApp());
 }
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
           darkTheme: ThemeData.dark().copyWith(
+            scaffoldBackgroundColor: Colors.black,
             bottomNavigationBarTheme: const BottomNavigationBarThemeData(
               selectedItemColor: Colors.pinkAccent,
               unselectedItemColor: Colors.grey,
@@ -69,7 +71,7 @@ class RootHandler extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
+    return StreamBuilder<User?> (
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {

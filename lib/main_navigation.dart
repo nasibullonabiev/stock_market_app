@@ -30,11 +30,12 @@ class _MainScreenState extends State<MainScreen> {
         currentIndex: _currentIndex,
         selectedItemColor: Colors.pink,
         unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
         onTap: (index) {
           setState(() => _currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home',),
           BottomNavigationBarItem(icon: Icon(Icons.pie_chart), label: 'Portfolio'),
           BottomNavigationBarItem(icon: Icon(Icons.show_chart), label: 'Market'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),

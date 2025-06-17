@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../main_navigation.dart';
 import '../home/home_screen.dart';
 import 'register_screen.dart';
 
@@ -41,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (result.user != null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) =>  HomeScreen()),
+          MaterialPageRoute(builder: (_) => const MainScreen()),
         );
       }
     } on FirebaseAuthException catch (e) {
@@ -58,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _loading = false);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

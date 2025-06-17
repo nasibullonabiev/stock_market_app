@@ -1,75 +1,120 @@
 import 'package:flutter/material.dart';
-import 'package:introduction_screen/introduction_screen.dart';
+import 'package:lottie/lottie.dart';
 import '../auth/login_screen.dart';
 
-class IntroScreen extends StatelessWidget {
+class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});
 
   @override
+  State<IntroScreen> createState() => _IntroScreenState();
+}
+
+class _IntroScreenState extends State<IntroScreen> {
+  final PageController _controller = PageController();
+  int _currentIndex = 0;
+
+  final List<Map<String, dynamic>> pages = [
+    {
+      'type': 'image',
+      'image': 'assets/images/img_1.png',
+      'title': 'Welcome to Gainora',
+      'subtitle': 'Invest smartly and track your assets with ease.',
+    },
+    {
+      'type': 'lottie',
+      'lottie': 'assets/lotties/Animation_1.json',
+      'title': 'Track Market in Real-Time',
+      'subtitle': 'Visualize gains, losses, and trends instantly.',
+    },
+    {
+      'type': 'lottie',
+      'lottie': 'assets/lotties/Animation_2.json',
+      'title': 'Grow Your Portfolio',
+      'subtitle': 'Make smarter decisions for better results.',
+    },
+  ];
+
+  void _nextPage() {
+    if (_currentIndex < pages.length - 1) {
+      _controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return IntroductionScreen(
-      pages: [
-        PageViewModel(
-          title: "Track Your Stocks",
-          body: "Monitor real-time market data and stock performance.",
-          image: _buildImageBox("1"),
-          decoration: _pageDecoration(),
-        ),
-        PageViewModel(
-          title: "Build Your Portfolio",
-          body: "Easily manage and analyze your stock investments.",
-          image: _buildImageBox("2"),
-          decoration: _pageDecoration(),
-        ),
-        PageViewModel(
-          title: "Stay Informed",
-          body: "Read daily news and updates about financial markets.",
-          image: _buildImageBox("3"),
-          decoration: _pageDecoration(),
-        ),
-      ],
-      onDone: () => Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      ),
-      onSkip: () => Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      ),
-      showSkipButton: true,
-      skip: const Text("Skip"),
-      next: const Icon(Icons.arrow_forward),
-      done: const Text("Done", style: TextStyle(fontWeight: FontWeight.bold)),
-      dotsDecorator: const DotsDecorator(
-        size: Size(10.0, 10.0),
-        color: Colors.grey,
-        activeSize: Size(22.0, 10.0),
-        activeColor: Colors.pink,
-        activeShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(25.0)),
-        ),
-      ),
-    );
-  }
+    return Scaffold(
+      body: SafeArea(
+        child: PageView.builder(
+          controller: _controller,
+          itemCount: pages.length,
+          onPageChanged: (index) => setState(() => _currentIndex = index),
+          itemBuilder: (context, index) {
+            final page = pages[index];
 
-  Widget _buildImageBox(String index) {
-    return Container(
-      height: 250,
-      width: 250,
-      decoration: BoxDecoration(
-        color: Colors.primaries[int.parse(index) % Colors.primaries.length].shade100,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Center(child: Text("Image $index", style: const TextStyle(fontSize: 18))),
-    );
-  }
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (page['type'] == 'image')
+                    Image.asset(page['image'], height: 250)
+                  else
+                    Lottie.asset(page['lottie'], height: 250),
 
-  PageDecoration _pageDecoration() {
-    return const PageDecoration(
-      titleTextStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      bodyTextStyle: TextStyle(fontSize: 16),
-      imagePadding: EdgeInsets.all(24),
-      contentMargin: EdgeInsets.symmetric(horizontal: 16),
+                  const SizedBox(height: 40),
+                  Text(
+                    page['title'],
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    page['subtitle'],
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  const Spacer(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      pages.length,
+                          (i) => AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        margin: const EdgeInsets.symmetric(horizontal: 6),
+                        width: _currentIndex == i ? 14 : 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: _currentIndex == i ? Colors.pink : Colors.grey,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _nextPage,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pink,
+                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 40),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: Text(
+                      _currentIndex == pages.length - 1 ? 'Get Started' : 'Next',
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }

@@ -14,7 +14,31 @@ class StockModel {
     required this.isGainer,
     required this.logoUrl,
   });
+
+  factory StockModel.fromJson(Map<String, dynamic> json) {
+    final double change = double.tryParse(json['change']?.toString() ?? '0') ?? 0;
+    return StockModel(
+      name: json['name'] ?? json['symbol'] ?? 'Unknown',
+      symbol: json['symbol'] ?? '',
+      price: double.tryParse(json['price']?.toString() ?? '0') ?? 0,
+      change: change,
+      isGainer: change >= 0,
+      logoUrl: 'https://logo.clearbit.com/${json['name']?.toString().toLowerCase().replaceAll(' ', '')}.com',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'symbol': symbol,
+      'price': price,
+      'change': change,
+      'isGainer': isGainer,
+      'logoUrl': logoUrl,
+    };
+  }
 }
+
 
 final List<StockModel> dummyStocks = [
   StockModel(

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../main.dart';
 import '../../services/theme_service.dart';
+import 'buy_premium.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -43,14 +45,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: const Text('Profile'),
         actions: [
-          Switch(
-            value: _themeService.isDarkMode,
-            onChanged: (_) {
-              _themeService.switchTheme();
-              setState(() {});
-            },
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: GestureDetector(
+              onTap: () {
+                _themeService.switchTheme();
+                setState(() {});
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeInOut, // smooth in and out
+                width: 65,
+                height: 36,
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: AnimatedAlign(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeInOut,
+                  alignment: _themeService.isDarkMode
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  child: Container(
+                    width: 28,
+                    height: 28,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.orange,
+                    ),
+                    child: Icon(
+                      _themeService.isDarkMode
+                          ? Icons.nights_stay
+                          : Icons.sunny,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
+
+
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -65,7 +104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 const CircleAvatar(
                   radius: 40,
-                  backgroundImage: NetworkImage('https://via.placeholder.com/150'),
+                  backgroundImage: AssetImage('assets/images/img_2.png'),
                 ),
                 const SizedBox(height: 12),
                 Text(nickname,
@@ -76,7 +115,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          _buildTile(Icons.monetization_on, 'Buy Premium'),
+          _buildTile(Icons.monetization_on, 'Buy Premium',onTap: (){
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const BuyPremiumScreen()),
+            );
+          }),
           _buildTile(Icons.notifications, 'Notifications'),
           _buildTile(Icons.security, 'Security'),
           _buildTile(Icons.help_outline, 'Help and Support'),
@@ -84,7 +128,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildTile(Icons.logout, 'Log Out', onTap: () async {
             await FirebaseAuth.instance.signOut();
             if (mounted) {
-              Navigator.pushReplacementNamed(context, '/login');
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const RootHandler()),
+                    (route) => false,
+              );
             }
           }),
         ],

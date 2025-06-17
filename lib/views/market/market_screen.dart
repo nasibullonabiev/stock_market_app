@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/stock_model.dart';
+import '../../services/stock_api_service.dart';
 import '../../widgets/stock_tile.dart';
 import '../stock/stock_detail_screen.dart';
 
@@ -12,11 +13,14 @@ class MarketScreen extends StatefulWidget {
 
 class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final StockApiService _stockApiService = StockApiService();
+  late Future<List<StockModel>> _stockFuture;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _stockFuture = _stockApiService.fetchStocks(); // uses cached by default
   }
 
   @override
@@ -27,9 +31,6 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final gainerStocks = dummyStocks.where((stock) => stock.isGainer).toList();
-    final loserStocks = dummyStocks.where((stock) => !stock.isGainer).toList();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Market'),
@@ -44,12 +45,28 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildStockList(gainerStocks),
-          _buildStockList(loserStocks),
-        ],
+      body: FutureBuilder<List<StockModel>>(
+        future: _stockFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No stock data available.'));
+          }
+
+          final stocks = snapshot.data!;
+          final gainers = stocks.where((s) => s.isGainer).toList();
+          final losers = stocks.where((s) => !s.isGainer).toList();
+
+          return TabBarView(
+            controller: _tabController,
+            children: [
+              _buildStockList(gainers),
+              _buildStockList(losers),
+            ],
+          );
+        },
       ),
     );
   }
@@ -72,6 +89,7 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
               MaterialPageRoute(
                 builder: (_) => StockDetailScreen(
                   name: stock.name,
+                  symbol: stock.symbol,
                   price: stock.price,
                   change: stock.change,
                 ),
