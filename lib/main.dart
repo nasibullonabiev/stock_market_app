@@ -64,14 +64,17 @@ class RootHandler extends StatelessWidget {
   const RootHandler({super.key});
 
   Future<bool> _isProfileComplete(String uid) async {
-    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get();
     final data = doc.data();
     return data != null && data['nickname'] != null && data['age'] != null;
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?> (
+    return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {

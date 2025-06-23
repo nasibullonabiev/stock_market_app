@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import '../auth/login_screen.dart';
@@ -36,7 +37,10 @@ class _IntroScreenState extends State<IntroScreen> {
 
   void _nextPage() {
     if (_currentIndex < pages.length - 1) {
-      _controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+      _controller.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     } else {
       Navigator.pushReplacement(
         context,
@@ -44,6 +48,18 @@ class _IntroScreenState extends State<IntroScreen> {
       );
     }
   }
+
+  final List<Color> _colorizeColors = [
+    Colors.pink,
+    Colors.deepPurple,
+    Colors.orange,
+    Colors.teal,
+  ];
+
+  final TextStyle _colorizeTextStyle = const TextStyle(
+    fontSize: 30,
+    fontWeight: FontWeight.bold,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -67,18 +83,37 @@ class _IntroScreenState extends State<IntroScreen> {
                     Lottie.asset(page['lottie'], height: 250),
 
                   const SizedBox(height: 40),
-                  Text(
-                    page['title'],
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+
+                  AnimatedTextKit(
+                    isRepeatingAnimation: true,
+                    repeatForever: true,
+                    animatedTexts: [
+                      ColorizeAnimatedText(
+                        page['title'],
+                        textStyle: _colorizeTextStyle,
+                        colors: _colorizeColors,
+                        textAlign: TextAlign.center,
+
+                      ),
+                    ],
                   ),
+
                   const SizedBox(height: 12),
-                  Text(
-                    page['subtitle'],
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                  AnimatedTextKit(
+                    isRepeatingAnimation: true,
+                    repeatForever: true,
+                    animatedTexts: [
+                      TyperAnimatedText(
+                        page['subtitle'],
+                        textStyle: const TextStyle(fontSize: 18, color: Colors.grey),
+                        textAlign: TextAlign.center,
+                        speed: const Duration(milliseconds: 50),
+                      ),
+                    ],
                   ),
+
                   const Spacer(),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
@@ -95,7 +130,9 @@ class _IntroScreenState extends State<IntroScreen> {
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 20),
+
                   ElevatedButton(
                     onPressed: _nextPage,
                     style: ElevatedButton.styleFrom(
@@ -107,6 +144,7 @@ class _IntroScreenState extends State<IntroScreen> {
                     ),
                     child: Text(
                       _currentIndex == pages.length - 1 ? 'Get Started' : 'Next',
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ],

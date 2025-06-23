@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               MaterialPageRoute(
                                 builder: (_) => StockDetailScreen(
                                   name: stock.name,
-                                  symbol: stock.symbol, // ✅ for future use
+                                  symbol: stock.symbol,
                                   price: stock.price,
                                   change: stock.change,
                                 ),
@@ -132,7 +132,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.deepPurple.shade800,
+        gradient: const LinearGradient(colors: [
+          Color(0xff0F2027),
+          Color(0xff203A43),
+          Color(0xff2C5364),
+        ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(

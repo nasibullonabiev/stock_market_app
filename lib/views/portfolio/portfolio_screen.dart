@@ -116,7 +116,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.deepPurple.shade800,
+        gradient: const LinearGradient(colors: [
+          Color(0xff0F2027),
+          Color(0xff203A43),
+          Color(0xff2C5364),
+        ]),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(

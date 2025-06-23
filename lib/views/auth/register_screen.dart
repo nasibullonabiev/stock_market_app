@@ -107,7 +107,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 child: _loading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Sign Up'),
+                    : const Text('Sign Up',style: TextStyle(color: Colors.white),),
               ),
 
               const SizedBox(height: 20),
@@ -122,7 +122,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         MaterialPageRoute(builder: (_) => const LoginScreen()),
                       );
                     },
-                    child: const Text('Sign In'),
+                    child: const Text('Sign In',style: TextStyle(fontWeight: FontWeight.bold),),
                   ),
                 ],
               ),

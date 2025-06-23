@@ -88,7 +88,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         'email': email,
       });
 
-      // ✅ Correct navigation to MainScreen (with bottom nav)
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const MainScreen()),
@@ -141,11 +140,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
               onPressed: _loading ? null : _submit,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.pink[700],
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 16,horizontal: 30),
               ),
               child: _loading
                   ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text('Continue to App'),
+                  : const Text('Continue to App',style: TextStyle(color: Colors.white),),
             ),
           ],
         ),

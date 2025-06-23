@@ -22,7 +22,13 @@ class BuyPremiumScreen extends StatelessWidget {
               Container(
                 height: 160,
                 width: double.infinity,
-                color: Colors.amberAccent,
+                decoration:  BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  gradient: const LinearGradient(colors: [
+                    Color(0xffFFE000),
+                    Colors.amberAccent
+                  ])
+                ),
                 child: Lottie.asset('assets/lotties/Animation_3.json')),
               const SizedBox(height: 32),
               Text(
@@ -53,7 +59,7 @@ class BuyPremiumScreen extends StatelessWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
                   onPressed: () {},
-                  child: const Text('Start 30-day free trial'),
+                  child: const Text('Start 30-day free trial',style: TextStyle(color: Colors.white),),
                 ),
               ),
               const SizedBox(height: 16),
