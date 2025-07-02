@@ -60,16 +60,20 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
     final Color changeColor = isPositive ? Colors.green : Colors.red;
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.name)),
+      appBar: AppBar(title: Text('${widget.symbol} Chart')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('€${widget.price.toStringAsFixed(2)}',
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-            Text('${isPositive ? '+' : ''}${widget.change.toStringAsFixed(2)}%',
-                style: TextStyle(fontSize: 18, color: changeColor)),
+            Text(
+              '€${widget.price.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              '${isPositive ? '+' : ''}${widget.change.toStringAsFixed(2)}%',
+              style: TextStyle(fontSize: 18, color: changeColor),
+            ),
             const SizedBox(height: 24),
 
             SizedBox(
@@ -87,9 +91,21 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
                     LineChartBarData(
                       isCurved: true,
                       spots: chartSpots,
-                      color: Colors.pink,
+                      color: changeColor,
+                      barWidth: 3,
+                      isStrokeCapRound: true,
                       dotData: FlDotData(show: false),
-                      belowBarData: BarAreaData(show: false),
+                      belowBarData: BarAreaData(
+                        show: true,
+                        gradient: LinearGradient(
+                          colors: [
+                            changeColor.withOpacity(0.2),
+                            changeColor.withOpacity(0.05),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                      ),
                     )
                   ],
                 ),
@@ -104,7 +120,7 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                     child: OutlinedButton(
-                      onPressed: () {}, // Future: hook real period filtering
+                      onPressed: () {}, // You can implement filters here
                       child: Text(label),
                     ),
                   );
@@ -125,7 +141,7 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
                   child: ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.pink[700]),
-                    child: const Text('BUY'),
+                    child: const Text('BUY',style: TextStyle(color: Colors.white),),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -133,7 +149,7 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
                   child: ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.pink[700]),
-                    child: const Text('SELL'),
+                    child: const Text('SELL',style: TextStyle(color: Colors.white),),
                   ),
                 ),
               ],

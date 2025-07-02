@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:stock_market_app/views/market/market_screen.dart';
 
 import '../../data/dummy_news.dart';
 import '../../models/stock_model.dart';
@@ -151,7 +152,9 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(color: Colors.white, fontSize: 18)),
           const SizedBox(height: 12),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+
+            },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
             child: const Text('Invest Today', style: TextStyle(color: Colors.pink)),
           )

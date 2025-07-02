@@ -5,7 +5,7 @@ import '../models/stock_model.dart';
 import '../models/historical_price.dart';
 
 class StockApiService {
-  static const _apiKey = 'd7741bf28d87f884503fe7260e423140';
+  static const _apiKey = 'a014e1a6d5742c43e3646fdcca85bf2e';
   static const _baseUrl = 'https://api.marketstack.com/v1';
   static const _symbols = [
     'AAPL', 'TSLA', 'AMZN', 'GOOGL', 'NFLX',

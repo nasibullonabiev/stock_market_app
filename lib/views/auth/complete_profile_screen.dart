@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:country_flags/country_flags.dart';
+
 import '../../main_navigation.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
@@ -14,8 +18,42 @@ class CompleteProfileScreen extends StatefulWidget {
 
 class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final _nameController = TextEditingController();
-  int _selectedYear = DateTime.now().year - 18; // default to 18 years old
+  int _selectedYear = DateTime.now().year - 18;
   bool _loading = false;
+  String? _countryCode;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCountry();
+  }
+
+  Future<void> _fetchCountry() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) return;
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition();
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty && mounted) {
+        setState(() {
+          _countryCode = placemarks.first.isoCountryCode; // 'US', 'DE', etc.
+        });
+      }
+    } catch (e) {
+      debugPrint("Failed to fetch country: $e");
+    }
+  }
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
@@ -86,6 +124,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         'birthYear': _selectedYear,
         'age': age,
         'email': email,
+        'countryCode': _countryCode,
       });
 
       Navigator.pushAndRemoveUntil(
@@ -99,7 +138,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       setState(() => _loading = false);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +153,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
               decoration: const InputDecoration(labelText: 'Your Name'),
             ),
             const SizedBox(height: 20),
+
             GestureDetector(
               onTap: _showCupertinoYearPicker,
               child: Container(
@@ -126,25 +165,36 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Birth Year: $_selectedYear',
-                      style: const TextStyle(fontSize: 16),
-                    ),
+                    Text('Birth Year: $_selectedYear', style: const TextStyle(fontSize: 16)),
                     const Icon(Icons.calendar_today),
                   ],
                 ),
               ),
             ),
+
+            const SizedBox(height: 20),
+
+            if (_countryCode != null)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CountryFlag.fromCountryCode(_countryCode!, height: 24, width: 32),
+                  const SizedBox(width: 8),
+                  Text('$_countryCode'),
+                ],
+              ),
+
             const SizedBox(height: 40),
+
             ElevatedButton(
               onPressed: _loading ? null : _submit,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.pink[700],
-                padding: const EdgeInsets.symmetric(vertical: 16,horizontal: 30),
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 30),
               ),
               child: _loading
                   ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text('Continue to App',style: TextStyle(color: Colors.white),),
+                  : const Text('Continue to App', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),

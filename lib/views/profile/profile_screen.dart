@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:stock_market_app/views/profile/terms_and_conditions.dart';
+import 'package:country_flags/country_flags.dart';
+
 import '../../main.dart';
 import '../../services/theme_service.dart';
 import 'buy_premium.dart';
@@ -18,6 +20,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String nickname = 'User';
   String email = '';
   String birthYear = 'Unknown';
+  String? countryCode;
 
   @override
   void initState() {
@@ -28,10 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _fetchUserProfile() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
-    final doc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .get();
+    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
     final data = doc.data();
 
     if (data != null) {
@@ -39,6 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         nickname = data['nickname'] ?? 'User';
         email = data['email'] ?? 'unknown@mail.com';
         birthYear = data['birthYear']?.toString() ?? 'Unknown';
+        countryCode = data['countryCode']; // Already saved in CompleteProfile
       });
     }
   }
@@ -59,22 +60,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 500),
                 curve: Curves.easeInOut,
-                // smooth in and out
                 width: 65,
                 height: 36,
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.secondary.withOpacity(0.2),
+                  color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: AnimatedAlign(
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.easeInOut,
-                  alignment: _themeService.isDarkMode
-                      ? Alignment.centerRight
-                      : Alignment.centerLeft,
+                  alignment: _themeService.isDarkMode ? Alignment.centerRight : Alignment.centerLeft,
                   child: Container(
                     width: 28,
                     height: 28,
@@ -83,9 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.orange,
                     ),
                     child: Icon(
-                      _themeService.isDarkMode
-                          ? Icons.nights_stay
-                          : Icons.sunny,
+                      _themeService.isDarkMode ? Icons.nights_stay : Icons.sunny,
                       color: Colors.white,
                       size: 18,
                     ),
@@ -140,6 +134,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+                if (countryCode != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CountryFlag.fromCountryCode(countryCode!, height: 20, width: 28),
+                        const SizedBox(width: 8),
+                        Text(
+                          countryCode!,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),
@@ -157,7 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildTile(Icons.notifications, 'Notifications'),
           _buildTile(Icons.security, 'Security'),
           _buildTile(Icons.help_outline, 'Help and Support'),
-          _buildTile(Icons.article, 'Terms and Conditions',onTap: (){
+          _buildTile(Icons.article, 'Terms and Conditions', onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const CreditsScreen()),
@@ -172,7 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (_) => const RootHandler()),
-                  (route) => false,
+                      (route) => false,
                 );
               }
             },

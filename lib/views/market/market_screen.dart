@@ -16,11 +16,13 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
   final StockApiService _stockApiService = StockApiService();
   late Future<List<StockModel>> _stockFuture;
 
+  String _searchQuery = '';
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _stockFuture = _stockApiService.fetchStocks(); // uses cached by default
+    _tabController = TabController(length: 3, vsync: this); // Added "All" tab
+    _stockFuture = _stockApiService.fetchStocks();
   }
 
   @override
@@ -40,35 +42,72 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
           labelColor: Colors.pink,
           unselectedLabelColor: Colors.grey,
           tabs: const [
+            Tab(text: 'All'),
             Tab(text: 'Gainer'),
             Tab(text: 'Loser'),
           ],
         ),
       ),
-      body: FutureBuilder<List<StockModel>>(
-        future: _stockFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No stock data available.'));
-          }
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            child: TextField(
+              cursorColor: Colors.pink,
+              onChanged: (value) => setState(() => _searchQuery = value),
+              decoration: InputDecoration(
+                hintText: 'Search stocks...',
+                hintStyle: const TextStyle(color: Colors.pink),
+                prefixIcon: const Icon(Icons.search,color: Colors.pink,),
+                filled: true,
+                fillColor: Colors.grey.shade400,
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
 
-          final stocks = snapshot.data!;
-          final gainers = stocks.where((s) => s.isGainer).toList();
-          final losers = stocks.where((s) => !s.isGainer).toList();
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: FutureBuilder<List<StockModel>>(
+              future: _stockFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No stock data available.'));
+                }
 
-          return TabBarView(
-            controller: _tabController,
-            children: [
-              _buildStockList(gainers),
-              _buildStockList(losers),
-            ],
-          );
-        },
+                final stocks = snapshot.data!;
+                final allFiltered = _filterStocks(stocks);
+                final gainersFiltered = _filterStocks(stocks.where((s) => s.isGainer).toList());
+                final losersFiltered = _filterStocks(stocks.where((s) => !s.isGainer).toList());
+
+                return TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildStockList(allFiltered),
+                    _buildStockList(gainersFiltered),
+                    _buildStockList(losersFiltered),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  List<StockModel> _filterStocks(List<StockModel> stocks) {
+    if (_searchQuery.isEmpty) return stocks;
+    return stocks.where((s) {
+      final query = _searchQuery.toLowerCase();
+      return s.name.toLowerCase().contains(query) || s.symbol.toLowerCase().contains(query);
+    }).toList();
   }
 
   Widget _buildStockList(List<StockModel> stocks) {
